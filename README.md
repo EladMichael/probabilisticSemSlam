@@ -1,6 +1,8 @@
 ## Probabilistic Semantic Slam
 This repository contains code for two separate tasks:
+
   The modelling / extraction of semantic assignment problems from the KITTI SLAM dataset
+
   The comparison / computation of probabilistic slam weights as described in the publication cited below
   
 This is also, ideally, a time-saver for anyone trying to develop a semantic SLAM framework of their own, as the framework of semantic data extraction is a central part of a full SLAM framework. The assignment code is also well isolated, ideally making it simple to lift and place into other frameworks as desired. 
