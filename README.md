@@ -14,7 +14,7 @@ Semantic measurements are more human readable, unique/sparse in the environment,
 To do
 
 ## Installation & Prerequisites
-This code is built primarily on [GTSAM](https://github.com/borglab/gtsam), [GTSAM-QUADRICS](https://github.com/best-of-acrv/gtsam-quadrics), Eigen and OpenCV. For plotting, I have used Matplot++. All of these libraries (in their C++ & Python incarnation in the case of OpenCV) are prerequisites to use all of the code in the repo.
+This code is built primarily on [GTSAM](https://github.com/borglab/gtsam), [GTSAM-QUADRICS](https://github.com/best-of-acrv/gtsam-quadrics), Eigen and OpenCV(C++ and Python). For plotting, I have used [Matplot++](https://alandefreitas.github.io/matplotplusplus/). 
 
 If you are interested in just the code which computes the probabilistic assignment weights (located in assignment.cpp, and shortestPath.cpp), then none of the previously cited prerequisites are needed, except for potentially Eigen (depending on usage).
 
