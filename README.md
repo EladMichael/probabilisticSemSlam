@@ -11,7 +11,8 @@ This is also, ideally, a time-saver for anyone trying to develop a semantic SLAM
 Semantic measurements are more human readable, unique/sparse in the environment, and higher information than pixel/geometric measurements. They are also more robust to lighting/viewpoint changes, a car is a car at day or night, from the left or the right. Probabilistic assignment allows for robust assignment in the face of uncertainty without throwing away any measurements, which is a requirement when there are only 3-5 measurements per frame! The only other work in the literature doing this used the matrix permanent, which is computationally infeasible for anything but tiny problems, and wasn't open source. I aimed to fix both of those problems.
 
 ## Screenshots
-To do
+
+[![@youtube Probabilistic Assignment for Semantic SLAM]](https://youtu.be/-yuNgoN7JAI)
 
 ## Installation & Prerequisites
 This code is built primarily on [GTSAM](https://github.com/borglab/gtsam), [GTSAM-QUADRICS](https://github.com/best-of-acrv/gtsam-quadrics), Eigen and OpenCV(C++ and Python). For plotting, I have used [Matplot++](https://alandefreitas.github.io/matplotplusplus/). 
