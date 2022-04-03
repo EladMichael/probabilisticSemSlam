@@ -22,8 +22,6 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
 
-
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 

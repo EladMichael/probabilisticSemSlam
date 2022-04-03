@@ -34,7 +34,6 @@
     // devkit - 
 // Path to kitti below should be the path to the directory ABOVE dataset, 
 // i.e. "kittiDirectory" in the example above
-
 const std::string pathToKitti("ENTER YOUR PATH HERE/");
 
 // ###############################################################
@@ -42,6 +41,8 @@ kittiReader::kittiReader(int seqN, bool color){
     this->seqN = seqN;
     this->color = color;
 
+    //        Not my smoothest presentation but... this is a check, not important
+    //                Don't enter your path here
     if(pathToKitti == "ENTER YOUR PATH HERE/"){
         throw std::runtime_error("Fill in the path to the KITTI dataset in kittiReader.cpp!\n");
     }
