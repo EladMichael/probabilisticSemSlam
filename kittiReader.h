@@ -12,12 +12,13 @@
 class kittiReader {
 public:
 	int seqN;
+	std::string seqSpec;
 	std::string pathToData;
 	std::string pathToSeq;
 	std::string pathToPose;
 	std::string pathToResults;
 
-	matplot::figure_handle f; //for live plitting
+	matplot::figure_handle f; //for live plotting
 	matplot::axes_handle ax; //for live plotting
 	// bool exists; //this sequence might not exist!
 	// image calibration parameters

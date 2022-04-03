@@ -32,7 +32,7 @@ std::vector<double> computeBBCostMatrix(const std::vector< boundBox >& bbL, cons
 
 void saveAssignmentProb(const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& meas,
                         const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& land,
-                        const semConsts& runConsts,std::string ID, size_t frame);
+                        const semConsts& runConsts,std::string savePath);
 
 std::vector< std::vector<double> > getAssignmentProbs(const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& meas,
                                             const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& land,

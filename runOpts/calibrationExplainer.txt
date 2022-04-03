@@ -1,0 +1,48 @@
+This is an explanatory file for the calibration file. The options do not have to be in order, or even all included. If a required constant is unspecified, a default value is defined in constsUtils.cpp . If a new constant is included incorrectly, or mispelled, constsUtils.cpp throws an error. 
+
+Format:
+
+constantAtRuntime Value
+
+###################################################################
+
+The current included constants are: 
+
+ODOM_ROT_SD_SENSE - The standard deviation of the odometry measurements in rotation. Range is [0,∞)
+
+ODOM_T_SD_SENSE - The standard deviation of the odometry measurements in translation. Range is [0,∞)
+
+LAND_ROT_SD - The standard deviation of the quadric landmarks in rotation. Range is [0,∞)
+
+LAND_RAD_SD - The standard deviation of the quadric landmarks' radii. Range is [0,∞)
+
+LAND_T_SD - The standard deviation of the quadric landmarks in translation. Range is [0,∞)
+
+BOX_SD - The standard deviation of the edges of the measurement bounding boxes in pixels. Range is [0,∞)
+
+STEREO_SD - The standard deviation of odometry *between* the left and right camera (should be really really small, or replaced with a true stereo solution). Range is [0,∞)
+
+NEW_LANDMARK_THRESH - A new landmark is not initiated unless it has probability greater than this threshold. A lower number will initiate landmarks more readily, a higher number will be more conservative about initiating landmarks. Range is [0,1]
+
+NEW_FACTOR_PROB_THRESH - A measurement will not be probabilistically attributed to a landmark unless it has probaiblity greater than this threshold. A lower number will create more assignments (more factors in the graph), a higher number will create fewer. Range is [0,1]
+
+NONASSIGN_QUADRIC - This is the "self assignment" cost or the "new landmark" cost used in the assignment problem. A lower number will make measurements more readily not assign to existing landmarks, a higher number will "force" the measurement to assign to "further" landmarks. Range is [0,∞)
+
+NONASSIGN_BOUNDBOX - This is the minimum intersection over union required before two bounding boxes will be associated with each other. Lowering will increase the number of measurements found, potentially spurious, increasing may be conservative. Range is [0,1].
+
+optWin - How many frames are included in the sliding window. This should be replaced using the incremental SAM framework honestly. More makes it slower (more batch), fewer makes it more stochastic. Range is [0,∞)
+
+probWin - This currently doesn't work quite right, but it should be the number of frames within the window for which to recompute the assignment probabilities. Range is [0,optWin]
+
+k - How many assignments to compute for each assignment problem. It will not compute more assignments than there are. Range is [0,∞)
+
+usePerm - boolean flag, whether or not to use the matrix permanent as opposed to the assignment enumeration
+
+netChoice - which ML net to use for bounding box extraction. Included options are: 
+    0: SSD MobileNet v2.0
+    1: YOLOv5 Nano
+    2: YOLOv5 Small
+    3: YOLOv5 Medium
+    99: The "uN-Net" i.e. no net i.e. no bounding boxes
+
+landmark_age_thresh - how many frames to wait for a landmark re-observation before tossing it as spurious. Longer age thresh, more computation and spurious correlation. Range is [0,∞)

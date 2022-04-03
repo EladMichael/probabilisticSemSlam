@@ -24,21 +24,48 @@ dataframe::dataframe(const std::string& toSeq, double baseline, int frameN, bool
     char dataSpecifier[20]; //longer than it should ever need to be
     sprintf(imgSpecifier,"%06i.png",frameN);
     sprintf(dataSpecifier,"%06i",frameN);
-    std::string dataDir("/home/emextern/Desktop/codeStorage/semSLAM/data/");
+
+    std::string dataDir("generatedData");
+    if(!file_exists(dataDir)){
+        std::cout<<"Making generatedData directory.\n";
+        mkdir(dataDir.c_str(),0777);
+    }
+
     // grab sequence number, i.e. 00, and / from end of toSeq
-    dataLPath = dataDir + toSeq.substr(toSeq.size()-3,3);
-    dataRPath = dataDir + toSeq.substr(toSeq.size()-3,3);
+    dataLPath = dataDir + "/" + toSeq.substr(toSeq.size()-3,3);
+    dataRPath = dataDir + "/" + toSeq.substr(toSeq.size()-3,3);
     if(!color){
         // grayscale
         camLPath = toSeq + std::string("image_0/") + imgSpecifier;
         camRPath = toSeq + std::string("image_1/") + imgSpecifier;
-        dataLPath += std::string("image_0/") + dataSpecifier;
-        dataRPath += std::string("image_1/") + dataSpecifier;
+        dataLPath += std::string("image_0/");
+        dataRPath += std::string("image_1/");
+        if(!file_exists(dataLPath)){
+            std::cout<<"Making data directory to save detections: "<<dataLPath<<std::endl;
+            mkdir(dataLPath.c_str(),0777);
+        }
+        if(!file_exists(dataRPath)){
+            std::cout<<"Making data directory to save detections: "<<dataRPath<<std::endl;
+            mkdir(dataRPath.c_str(),0777);
+        }
+        dataLPath += dataSpecifier;
+        dataRPath += dataSpecifier;
     }else{
+        // color
         camLPath = toSeq + std::string("image_2/") + imgSpecifier;
         camRPath = toSeq + std::string("image_3/") + imgSpecifier;
-        dataLPath += std::string("image_2/") + dataSpecifier;
-        dataRPath += std::string("image_3/") + dataSpecifier;
+        dataLPath += std::string("image_2/");
+        dataRPath += std::string("image_3/");
+        if(!file_exists(dataLPath)){
+            std::cout<<"Making data directory to save detections: "<<dataLPath<<std::endl;
+            mkdir(dataLPath.c_str(),0777);
+        }
+        if(!file_exists(dataRPath)){
+            std::cout<<"Making data directory to save detections: "<<dataRPath<<std::endl;
+            mkdir(dataRPath.c_str(),0777);
+        }
+        dataLPath += dataSpecifier;
+        dataRPath += dataSpecifier;
     }
     if(file_exists(camLPath) && file_exists(camRPath)){
         imgL = cv::imread(camLPath);
@@ -53,36 +80,32 @@ dataframe::dataframe(const std::string& toSeq, double baseline, int frameN, bool
 
 void dataframe::computeBoundingBoxes(bbNet& imageNet, const semConsts& runConsts)
 {
-    bool verbose = true;
+    bool verbose = false;
 
     if(imageNet.get_netChoice() == 99){bbL.clear();bbR.clear();return;}
 
-    dataLPath += "_"+std::to_string(imageNet.get_netChoice())+".tt";
-    dataRPath += "_"+std::to_string(imageNet.get_netChoice())+".tt";
+    dataLPath += "_"+std::to_string(imageNet.get_netChoice())+".txt";
+    dataRPath += "_"+std::to_string(imageNet.get_netChoice())+".txt";
 
     // if the file doesn't exist, save the data, to aovid recomputation next time.
     // this will majorly speed up runs in the future, for prototyping purposes.
-    bool saveDataFlag = false;
+    bool saveDataFlag = true;
     if(file_exists(dataLPath) && file_exists(dataRPath)){
         //load the data from file
         std::ifstream ifs;
         ifs.open(dataLPath, std::ifstream::in);
-        size_t obj = 0;
         while(ifs.peek() != std::ifstream::traits_type::eof()){
             bbL.push_back(boundBox());
             ifs.read((char*)&bbL[obj], sizeof(bbL[obj]));
-            obj++;
         }
         ifs.close();
         // bbL.pop_back();
 
 
         ifs.open(dataRPath, std::ifstream::in);
-        obj = 0;
         while(ifs.peek() != std::ifstream::traits_type::eof()){
             bbR.push_back(boundBox());
             ifs.read((char*)&bbR[obj], sizeof(bbR[obj]));
-            obj++;
         }
         ifs.close(); 
         // bbR.pop_back();
@@ -332,69 +355,6 @@ void dataframe::saveData(){
     ofsR.close();   
 }
 //###########################################################################################
-gtsam::Point3 dataframe::triangulatePoint(const cv::Point2f& pl,const cv::Point2f& pr) const
-{
-    gtsam::Pose3 P0 = gtsam::Pose3();
-    gtsam::Pose3 P1 = P0.compose(gtsam::Pose3(gtsam::Rot3(),gtsam::Point3(baseline,0,0)));
-    Eigen::Matrix<double,4,4> Pl = P0.matrix();
-    Eigen::Matrix<double,4,4> Pr = P1.matrix();
-
-    Eigen::Matrix<double,4,4> A;    
-    for( int k = 0; k < 4; k++ )
-    {
-        A(0, k) = pl.x * Pl(2,k) - Pl(0,k);
-        A(1, k) = pl.y * Pl(2,k) - Pl(1,k);
-        A(2, k) = pr.x * Pr(2,k) - Pr(0,k);
-        A(3, k) = pr.y * Pr(2,k) - Pr(1,k);
-    }
-
-    /* Solve system for current point */
-    Eigen::JacobiSVD<Eigen::Matrix<double,4,4>> svd(A, Eigen::ComputeFullV);
-    Eigen::MatrixXd V = svd.matrixV();
-
-    /* Copy computed point */
-    gtsam::Point3 output = -V({0,1,2},3) / V(3,3);
-    return output;
-}
-//###########################################################################################
-gtsam::Point3 dataframe::triangulate(const Eigen::Matrix<double,3,4>& P0, const Eigen::Matrix<double,3,4>& P1,size_t obj) const
-{
-    Eigen::Matrix<double,4,4> A;    
-    double x0 = 0.5*(bbL[obj].xmin()+bbL[obj].xmax());
-    double y0 = 0.5*(bbL[obj].ymin()+bbL[obj].ymax());
-    double x1 = x0 + bbL[obj].xOffset;
-    double y1 = y0;
-    for( int k = 0; k < 4; k++ )
-    {
-        A(0, k) = x0 * P0(2,k) - P0(0,k);
-        A(1, k) = y0 * P0(2,k) - P0(1,k);
-        A(2, k) = x1 * P1(2,k) - P1(0,k);
-        A(3, k) = y1 * P1(2,k) - P1(1,k);
-    }
-
-    /* Solve system for current point */
-    Eigen::JacobiSVD<Eigen::Matrix<double,4,4>> svd(A, Eigen::ComputeFullV);
-    Eigen::MatrixXd V = svd.matrixV();
-
-    /* Copy computed point */
-    gtsam::Point3 output = -V({0,1,2},3) / V(3,3);
-    return output;
-}
-//###########################################################################################
-// std::vector<gtsam::Point3> dataframe::triangulateAll(const Eigen::Matrix<double,3,3>& K, const gtsam::Pose3& P) const {
-//     std::vector<gtsam::Point3> priors;
-
-//     gtsam::Pose3 rightNudge = gtsam::Pose3(gtsam::Rot3(),gtsam::Point3(-baseline,0,0));
-//     std::vector< Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 4> > > projMatrices(2);
-//     projMatrices[0] = K*(P.matrix().block<3,4>(0,0));
-//     projMatrices[1] = K*((P.compose(rightNudge)).matrix().block<3,4>(0,0));
-
-//     for(size_t obj = 0; obj < bbL.size(); obj++){
-//         priors.push_back(triangulate(projMatrices,obj));
-//     }
-//     return priors;
-// }
-//###########################################################################################
 void dataframe::calibObjs(const gtsam::Pose3& P,const gtsam::Cal3_S2::shared_ptr& K){
 
     gtsam::Pose3 rightNudge = gtsam::Pose3(gtsam::Rot3(),gtsam::Point3(baseline,0,0));
@@ -482,8 +442,6 @@ void dataframe::estQuadrics(const gtsam::Pose3& Pl,const gtsam::Cal3_S2::shared_
             case 14: obj_depth = 0.5; break; //bench
             default: obj_depth = 2;
         }    
-        // get center 
-        // gtsam::Point3 center = triangulate(projL,projR,obj);
 
         double u = 0.5*(bbL[obj].xmin()+bbL[obj].xmax());
         double v = 0.5*(bbL[obj].ymin()+bbL[obj].ymax());
@@ -543,11 +501,6 @@ void dataframe::estQuadrics(const gtsam::Pose3& Pl,const gtsam::Cal3_S2::shared_
         cv::imshow("White Measurements, Red Reprojection",bigImg);
         cv::waitKey(5000);
     }
-        
-
-
-
-
 
 }
 // #####################################################################################################
@@ -633,6 +586,14 @@ void dataframe::saveBoxes(const std::string& imgText, size_t frame,const gtsam::
             cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0,0,255), 2);        
     }
 
-    std::string fileName = std::string("ass/frame") + std::to_string(frame) + std::string(".jpg");
+    if(!file_exists("generatedData")){
+        std::cout<<"Making generatedData directory.\n";
+        mkdir("generatedData",0777);
+    }
+    if(!file_exists("generatedData/associations")){
+        std::cout<<"Making generatedData/associations directory.\n";
+        mkdir("generatedData/associations",0777);
+    }
+    std::string fileName = std::string("generatedData/associations/frame") + std::to_string(frame) + std::string(".jpg");
     cv::imwrite(fileName, bigImg);
 }

@@ -1,5 +1,5 @@
 #include "bbNet.h"
-
+#include "constsUtils.h"
 #include <fstream>
 
 // #####################################################################
@@ -192,11 +192,16 @@ cv::Mat bbNet::singleImgBlob(const cv::Mat& img) const {
 }
 // #####################################################################
 void bbNet::set_netChoice(int netChoice){
-    std::string dir("/home/emextern/Desktop/codeStorage/semSLAM/nets/");
+    std::string dir("nets/");
+    if(!file_exists(dir)){
+        dir = "../"+dir;
+    }
+    if(!file_exists(dir)){
+        throw std::runtime_error("Couldn't find ML networks, check this and the above directory!");
+    }
     this->netChoice = netChoice;
 
     switch(netChoice){
-        case 99: name = std::string("The uN-Net"); return;
         case 0: net = cv::dnn::readNet(dir+"frozen_inference_graph.pb", 
                 dir+"ssd_mobilenet_v2_coco_2018_03_29.txt","TensorFlow"); 
                 name = std::string("SSD MobileNet v2.0");
@@ -210,6 +215,7 @@ void bbNet::set_netChoice(int netChoice){
         case 3: net = cv::dnn::readNet(dir+"yolov5m_320.onnx");
                 name = std::string("YOLOv5 Medium");
                 break;
+        case 99: name = std::string("The uN-Net"); return;
     } 
 
     std::ifstream ifs;

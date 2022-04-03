@@ -51,35 +51,33 @@ public:
   // vector to hold dual quadric estimates
   std::vector< gtsam_quadrics::ConstrainedDualQuadric > quadEst;
 
+  // constructor
   dataframe(const std::string& toSeq, double baseline, int frameN, bool color);
 
+  // compute the bounding boxes (extract them, align them, and match them)
   void computeBoundingBoxes(bbNet& imageNet, const semConsts& runConsts);
 
   int matchingBox(const boundBox& box, const std::vector<boundBox>& candidates);
 
-  // gtsam::Point3 triangulate(const std::vector< Eigen::Matrix<double,3,4> , Eigen::aligned_allocator<Eigen::Matrix<double, 3, 4> > >& projMatrices, size_t obj) const;
-  gtsam::Point3 triangulate(const Eigen::Matrix<double,3,4>& P0, const Eigen::Matrix<double,3,4>& P1,size_t obj) const;
-
-  gtsam::Point3 triangulatePoint(const cv::Point2f& p0,const cv::Point2f& p1) const;
-
-  // std::vector<gtsam::Point3> triangulateAll(const Eigen::Matrix<double,3,3>& K, const gtsam::Pose3& P) const;
-
-  // cv::Mat detectBoxes(cv::dnn::Net& model,bool left);
-
+  // for testing purposes, creates calibration objects
   void calibObjs(const gtsam::Pose3& P,const gtsam::Cal3_S2::shared_ptr& K);
 
+  // using the computed bounding boxes, computes quadrics for each bb pair
   void estQuadrics(const gtsam::Pose3& Pl,const gtsam::Cal3_S2::shared_ptr& K);
 
+  // Getters
   cv::Mat getImgL(){return imgL;}
   cv::Mat getImgR(){return imgR;}
+  size_t getFrame()const {return frame;}
+
+
+  // Debugging / Saving functions
   void showImg(int wait = 20){cv::imshow("img",imgL); cv::waitKey(wait);}
   void showBoxes(const std::string& imgText);
-  // void saveBoxes(const std::string& imgText, size_t frame);
   void saveBoxes(const std::string& imgText,size_t frame,const gtsam::Cal3_S2::shared_ptr& K,
     std::vector<gtsam_quadrics::ConstrainedDualQuadric> landmarks = std::vector<gtsam_quadrics::ConstrainedDualQuadric>(),
     std::vector<gtsam::Key> landmarkKeys = std::vector<gtsam::Key>(),gtsam::Pose3 Pl = gtsam::Pose3());
   bool isColor(){return color;}
-  size_t getFrame()const {return frame;}
   void saveData();
 
 };

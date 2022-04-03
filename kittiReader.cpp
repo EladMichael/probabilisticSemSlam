@@ -10,20 +10,57 @@
 #include <cmath>
 #include <gtsam/inference/Symbol.h>
 
+// Kitti directory structure is assumed to be the same as the distribution 
+// originally, i.e.
+// kittiDirectory - 
+    // dataset - 
+        // poses - 
+        //     00.txt
+        //     01.txt
+        //     etc.
+        // sequences - 
+        //     00 - 
+        //         calib.txt
+        //         image_0 (left gray) - 
+        //             000000.png
+        //             000001.png
+        //             etc
+        //         image_1 (right gray) - 
+        //
+        //         image_2 (left color) - 
+        // 
+        //         image_3 (right color) -
+    
+    // devkit - 
+// Path to kitti below should be the path to the directory ABOVE dataset, 
+// i.e. "kittiDirectory" in the example above
 
+const std::string pathToKitti("Path to Kitti Data");
 
 // ###############################################################
 kittiReader::kittiReader(int seqN, bool color){   
     this->seqN = seqN;
     this->color = color;
-    pathToData = "/home/emextern/datasets/kitti/dataset/";
+    pathToData = pathToKitti + std::string("dataset/");
     pathToSeq = pathToData + std::string("sequences/");
     pathToPose = pathToData + std::string("poses/");
-    pathToResults = "/home/emextern/datasets/kitti/results/";
+
+    pathToResults = pathToKitti + std::string("results");
+
+    if(!file_exists(pathToResults)){
+        std::cout<<"Making results directory: "<<pathToResults<<std::endl;
+        mkdir(pathToResults.c_str(),0777);
+    }
+
     char seqSpecifier[30];
     sprintf(seqSpecifier,"%02i/",seqN);
+    this->seqSpec = std::string(seqSpecifier);
     pathToSeq += seqSpecifier;
     pathToResults += seqSpecifier;
+    if(!file_exists(pathToResults)){
+        std::cout<<"Making subresults directory for sequence: "<<seqSpecifier<<std::endl;
+        mkdir(pathToResults.c_str(),0777);
+    }
     sprintf(seqSpecifier,"%02i.txt",seqN);
     pathToPose += seqSpecifier;
     loadCalib();    

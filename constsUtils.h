@@ -23,8 +23,6 @@ inline double toc( const std::chrono::high_resolution_clock::time_point& t2)
 
 struct semConsts{
 
-	double ODOM_ROT_SD_GEN;
-	double ODOM_T_SD_GEN;
 	double ODOM_ROT_SD_SENSE;
 	double ODOM_T_SD_SENSE;
 	double LAND_ROT_SD;
@@ -63,16 +61,14 @@ struct semConsts{
 	semConsts(std::string fileName){
 
 		if(!file_exists(fileName)){
-				std::string errMsg("Settings file could not be found: \n");
+				std::string errMsg("Settings file could not be found with path: ");
 				errMsg += fileName;
 				throw std::runtime_error(errMsg);
 		}
 
 		//default values, in case none are specified
-		ODOM_ROT_SD_SENSE = 0.01;
-		ODOM_T_SD_SENSE = 2.0;
-		ODOM_ROT_SD_GEN = 0.001;
-		ODOM_T_SD_GEN = 1.0;
+		ODOM_ROT_SD_SENSE = 0;
+		ODOM_T_SD_SENSE = 0;
 		LAND_ROT_SD = 0.1;
 		LAND_T_SD = 1;
 		LAND_RAD_SD = 2;
@@ -82,12 +78,15 @@ struct semConsts{
 		NEW_FACTOR_PROB_THRESH = 0.05;
 		NONASSIGN_QUADRIC = 55.0;
 		NONASSIGN_BOUNDBOX = 0.20;
-		optWin = 15;
-		probWin = 15;
-		k = 100;
+		optWin = 31;
+		// this function does not currently work quite right, but I'm leaving it here
+		// in case I really care about it in the future!
+		probWin = 0; 
+		k = 200;
 		usePerm = 0;
 		netChoice = 1;
 		landmark_age_thresh = 2;
+
 
 		std::ifstream myFile(fileName);
 		std::string line;
@@ -104,10 +103,6 @@ struct semConsts{
 				ODOM_ROT_SD_SENSE = val;
 			}else if(line == "ODOM_T_SD_SENSE"){
 				ODOM_T_SD_SENSE = val;
-			}else if(line == "ODOM_T_SD_GEN"){
-				ODOM_T_SD_GEN = val;
-			}else if(line == "ODOM_ROT_SD_GEN"){
-				ODOM_ROT_SD_GEN = val;
 			}else if(line == "BOX_SD"){
 				BOX_SD = val;
 			}else if(line == "STEREO_SD"){

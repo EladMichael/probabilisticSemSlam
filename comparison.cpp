@@ -30,7 +30,7 @@ void sweepKPlots(std::vector<double>& k1Times,std::vector<double>& k20Times,
 
 
 bool getCosts(const std::string& id, size_t frame, std::vector< std::vector<double> >& costs){
-    std::string dir("/home/emextern/Desktop/codeStorage/semSLAM/data/00/costMatrices/");
+    std::string dir("generatedData/00/costMatrices/");
     std::string fileName = id + "_frame"+std::to_string(frame)+".dat";
 
     if(!file_exists(dir+fileName)){
@@ -331,23 +331,12 @@ int main(int argc, char** argv){
     }
 
 
-    FILE *myFile;
-    myFile = fopen(("/home/emextern/Desktop/codeStorage/semSLAM/data/00/costMatrices/"+idString+"_RESULTS.dat").c_str(),"w");
-    // fprintf(myFile,"assignmentTimes, approxPermTimes, exactPermTimes, exactLongPermTimes, fastestPermTimes, assErr, apxErr, exactErr, exactLongErr, fastErr, row, cols");
-    fprintf(myFile,"assignmentTimes, approxPermTimes, exactPermTimes, fastestPermTimes, assErr, apxErr, exactErr, fastErr, row, cols");
-    for(size_t i = 0; i < assignmentTimes.size(); i++){
-        fprintf(myFile,"%g %g %g %g %g %g %g %g %zu %zu\n",assignmentTimes[i],
-            approxPermTimes[i],exactPermTimes[i],
-            fastestPermTimes[i],maxAssignmentErr[i],maxApproxPermErr[i],
-            maxExactPermErr[i],maxFastPermErr[i],rows[i],cols[i]);
-    }
-    fclose(myFile);
-
     if(!verbose){
         timePlots(assignmentTimes,approxPermTimes,exactPermTimes,fastestPermTimes,rows,cols);
         errPlots(k,maxAssignmentErr,k20Errs,maxApproxPermErr,maxExactPermErr,maxFastPermErr,rows,cols);
         sweepKPlots(k1Times,k20Times,k1000Times,k100Times,k200Times,k1Errs,k20Errs,k1000Errs,k100Errs,k200Errs);
     }
+
     return 1;
 }
 

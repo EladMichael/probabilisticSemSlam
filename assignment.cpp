@@ -215,15 +215,12 @@ std::vector< std::vector<double> > permanentProb(std::vector< double > costMatri
         setupAssgnMatrix(subProbs,fullProbs,m);
         for(size_t l = 0; l < nL; l++){
             if(fullProbs(l,m) != 0){
-                if(verbose){
-                    std::cout<<"-----------------------------\n";
-                }
+                // if(verbose){
+                //     std::cout<<"-----------------------------\n";
+                // }
                 double lmPerm = fullProbs(l,m)*conditionedPermanent(subProbs,permOpt);
                 // double lmPerm = fullProbs(l,m)*permWAssignments(subProbs);
-                if(lmPerm < 0){
-                    std::cout<<"IT'S NEGATIVE AGAIN\n";
-                    std::cout<<" from conditioned perm fastest: "<<lmPerm<<std::endl;
-                }
+                
                 fullColPerm += std::abs(lmPerm);
                 probs[m][l] = std::abs(lmPerm);
                 if(verbose){
@@ -297,6 +294,7 @@ void setupAssgnMatrix(Eigen::MatrixXd& subProbs, const Eigen::MatrixXd& fullProb
 //     subProbs.block(0,col,subProbs.rows(),subProbs.cols()-col) = fullProbs.block(1,col+1,subProbs.rows(),subProbs.cols()-col);
 // }
 
+    //setup the sub matrix for permanent computation 
 
     const bool verbose = false;
     size_t nRows = fullProbs.rows();
@@ -305,19 +303,6 @@ void setupAssgnMatrix(Eigen::MatrixXd& subProbs, const Eigen::MatrixXd& fullProb
     size_t nL = nRows - nM;
     // const size_t row = 0;
 
-    // //above to the left
-    // subProbs.block<row,col>(0,0,) = fullProbs.block<row,col>(0,0,);
-
-    // //above to the right
-    // subProbs.block<row,nCols-1-col>(0,col,) = fullProbs.block<row,nCols-1-col>(0,col+1,);
-    // if(verbose){
-    //     std::cout<<"nCols: "<<nCols<<" nRows: "<<nRows<<" nL: "<<nL<<std::endl;
-    //     std::cout<<"removing column: "<<col<<std::endl;
-    //     std::cout<<"Thing 0 el: \n"<<fullProbs<<std::endl;
-    //     std::cout<<"Thing 0 sub: \n"<<subProbs<<std::endl;
-    // }
-    //middle to the left
-    // subProbs.block<nL-1-row+col,col>(row,0,) = fullProbs.block<nL-1-row+col,col>(row+1,0,);
     if(col>0){
         //if col == 0, nothing to the left
         // if(verbose){
@@ -334,36 +319,6 @@ void setupAssgnMatrix(Eigen::MatrixXd& subProbs, const Eigen::MatrixXd& fullProb
         // }
         subProbs.block(0,col,nRows-1,nCols-1-col) = fullProbs.block(1,col+1,nRows-1,nCols-1-col);
     }
-
-        
-
-    //middle to the right
-    // subProbs.block<nL-1-row+col,nCols-1-col>(row,col,) = fullProbs.block<nL-1-row+col,nCols-1-col>(row+1,col+1,);
-    // if(col < nM-1){
-    //     //if col == nM-1 (last col), nothing to the right
-    //     //also... nothing below, if col is last column.
-    //     if(verbose){
-    //         std::cout<<"Thing 2 el: \n"<<fullProbs.block(1,col+1,nL-1+col,nCols-1-col)<<std::endl;
-    //         std::cout<<"Thing 2 sub: \n"<<subProbs.block(0,col,nL-1+col,nCols-1-col)<<std::endl;
-    //     }
-    //     subProbs.block(0,col,nL-1+col,nCols-1-col) = fullProbs.block(1,col+1,nL-1+col,nCols-1-col);
-
-    //     if(col>0){
-    //         if(verbose){
-    //             std::cout<<"Thing 3 el: \n"<<fullProbs.block(nL+col+1,0,nM-1-col,col)<<std::endl;
-    //             std::cout<<"Thing 3 sub: \n"<<subProbs.block(nL+col-1,0,nM-1-col,col)<<std::endl;    
-    //         }
-    //         //below to the left, nothing to the left if col == 0
-    //         subProbs.block(nL+col-1,0,nM-1-col,col) = fullProbs.block(nL+col+1,0,nM-1-col,col);
-    //     }
-
-    //     if(verbose){
-    //         //below to the right
-    //         std::cout<<"Thing 4 el: \n"<<fullProbs.block(nL+col+1,col+1,nM-1-col,nCols-1-col)<<std::endl;
-    //         std::cout<<"Thing 4 sub: \n"<<subProbs.block(nL+col-1,col,nM-1-col,nCols-1-col)<<std::endl;
-    //     }
-    //     subProbs.block(nL+col-1,col,nM-1-col,nCols-1-col) = fullProbs.block(nL+col+1,col+1,nM-1-col,nCols-1-col);
-    // }
 
 }
 //##################################################################################
@@ -843,7 +798,7 @@ std::vector<double> computeBBCostMatrix(const std::vector< boundBox >& bbL, cons
 //########################################################################################
 void saveAssignmentProb(const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& meas,
                         const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& land,
-                        const semConsts& runConsts,std::string ID, size_t frame){
+                        const semConsts& runConsts,std::string savePath){
 
     std::vector< Eigen::Matrix<double,3,1> > measMeans = getMeans(meas);
     std::vector< Eigen::Matrix<double,3,3> > measCovs = getCovs(meas);
@@ -863,7 +818,7 @@ void saveAssignmentProb(const std::vector< gtsam_quadrics::ConstrainedDualQuadri
     size_t nRows = nL+nM;
     size_t nCols = nM;
 
-    std::ofstream myfile("/home/emextern/Desktop/codeStorage/semSLAM/data/00/costMatrices/"+ID+"_frame"+std::to_string(frame)+".dat");
+    std::ofstream myfile(savePath);
     for(size_t r = 0; r < nRows; r++){
         for(size_t c = 0; c < nCols; c++){
             myfile << std::to_string(costMatrix[c*nRows+r]);
@@ -875,103 +830,6 @@ void saveAssignmentProb(const std::vector< gtsam_quadrics::ConstrainedDualQuadri
     }
     myfile.close();
     return;
-
-
-}
-// ###################################################################################################################
-double permWAssignments(const Eigen::MatrixXd& A){
-                                            // const std::vector< gtsam_quadrics::ConstrainedDualQuadric >& land,
-                                            // const semConsts& runConsts,bool condition){
-    
-    size_t nRows = A.rows();
-    size_t nCols = A.cols();
-
-// std::reduce(costMatrix.begin(),costMatrix.end());
-    if(nCols == 1){
-        // only one column. Normalize by sum of the column, and return it!
-        // std::vector<double> costs = costMatrix;
-        double perm = 0;
-        for(size_t r = 0; r < nRows; r++){
-            perm+= A(r,0);
-        }
-        return perm;
-    }
-
-    std::vector<double> costs(nRows*nCols);
-    for(size_t c = 0; c < nCols; c++){
-        for(size_t r = 0; r < nRows; r++){
-            costs[c*nRows+r] = -std::log(A(r,c));
-        }
-    }
-    // size_t nRowsOrig = nRows;
-
-    // std::vector<ptrdiff_t> rowIdx;
-    // if(condition){
-    //     costMatrix = conditionCosts(costMatrix,nRows,nCols,rowIdx);
-    //     //nCols will not change
-    //     nRows = costMatrix.size()/nCols;
-    // }
-
-    // max number of enumerated assignments
-    double mincBound = 1;
-    for(size_t r = 0; r < nRows; r++){
-        size_t rowCard = 1;
-        for(size_t c = 0; c < nCols; c++){
-            if(costs[c*nRows+r] > 0){
-                rowCard++;
-            }
-        }
-        mincBound *= mincFactor(rowCard);
-    }
-    size_t k = static_cast<size_t>(mincBound)+2;
-
-    ScratchSpace workMem;//Scratch space needed for the assignment algorithm.
-    //Allocate scratch space, numRow numRow is on purpose! Row major.
-    workMem.init(nRows,nRows);
-    ptrdiff_t rowAssignments[nRows*k];
-    ptrdiff_t colAssignments[nCols*k];
-    double assignmentCosts[k];
-
-    /*The assignment algorithm returns a nonzero value if no valid
-     * solutions exist.*/
-    bool maximize = false; //Maximize or minimize assignment
-    int numFound = kBest2D(k,nRows,nCols,maximize,costs.data(),workMem,rowAssignments,colAssignments,assignmentCosts);
-    // int numFound = kBest2DCutoff(k,nRows,nCols,maximize,costs.data(),workMem,rowAssignments,colAssignments,assignmentCosts,cutoff);
-
-    bool verbose = false;
-    if(verbose){
-        std::cout<<"Cost Matrix in brute force perm:\n";
-        for(size_t r = 0; r < nRows; r++){
-            for(size_t c = 0; c < nCols; c++){
-                std::cout<<costs[c*nRows+r]<<" ";
-            }
-            std::cout<<std::endl;
-        }
-        std::cout<<"Assignments: \n";
-        for(size_t i = 0; i < numFound; i++){
-            for(size_t c = i*nCols; c < (i+1)*nCols; c++){
-                std::cout<<colAssignments[c]<<" ";
-            }
-            std::cout<<" with cost "<<assignmentCosts[i]<<std::endl;
-        }
-    }
-
-    // compute assignment probabilities
-    // each measurement gets a vector of probabilities, with a prob for each landmark +1 for nonassignment
-    double perm;
-    double bestCost = assignmentCosts[0]; //used as a normalization constant, for numerical overflow. 
-
-    for(int sol = 0; sol < numFound; sol++){
-        double assgnProb;
-        if(bestCost+cutoff > assignmentCosts[sol]){
-            perm += std::exp(bestCost - assignmentCosts[sol]); 
-        }else{
-            continue;
-        }
-    }
-
-    return std::exp(-bestCost)*perm;
-    
 }
 //##################################################################################
 std::vector< std::vector<double> > bruteForceProb(const std::vector< double >& costMatrix, size_t nL, size_t nM){
@@ -1008,10 +866,7 @@ std::vector< std::vector<double> > bruteForceProb(const std::vector< double >& c
         mincBound *= mincFactor(rowCard);
     }
     size_t upperK = std::min(static_cast<size_t>(mincBound)+1,static_cast<size_t>(20000)); //+1 if it rounds down, +1 to be greater than that
-    // std::cout<<"\n\nUpper bound "<<mincBound<<" becomes "<<upperK;
-    // max number of enumerated assignments
-    // TODO: add cost delta cutoff
-    // int k = 100;
+    
     ScratchSpace workMem;//Scratch space needed for the assignment algorithm.
     //Allocate scratch space, numRow numRow is on purpose! Row major.
     workMem.init(nRows,nRows);
@@ -1023,18 +878,16 @@ std::vector< std::vector<double> > bruteForceProb(const std::vector< double >& c
      * solutions exist.*/
     bool maximize = false; //Maximize or minimize assignment
     int numFound = kBest2D(upperK,nRows,nCols,maximize,costMatrix.data(),workMem,rowAssignments,colAssignments,assignmentCosts);
-    // int numFound = kBest2DCutoff(k,nRows,nCols,maximize,costMatrix.data(),workMem,rowAssignments,colAssignments,assignmentCosts,cutoff);
-    // std::cout<<" and found: "<<numFound;
-    // std::cout<<" with cost delta: "<<assignmentCosts[numFound-1]-assignmentCosts[0]<<std::endl;
+   
     bool verbose = false;
 
-    if(numFound == upperK){
-        std::cout<<"\n\n Found the upper limit of assignments possible?! Seems not right....\n\n";
-        std::cout<<"Minc Bound: "<<mincBound<<std::endl;
-        std::cout<<"Upper bound: "<<upperK<<std::endl;
-        std::cout<<"Found: "<<numFound<<std::endl;
-        // verbose = false;
-    }
+    // if(numFound == upperK){
+    //     std::cout<<"\n\n Found the upper limit of assignments possible?! Seems not right....\n\n";
+    //     std::cout<<"Minc Bound: "<<mincBound<<std::endl;
+    //     std::cout<<"Upper bound: "<<upperK<<std::endl;
+    //     std::cout<<"Found: "<<numFound<<std::endl;
+    //     // verbose = false;
+    // }
 
     if(verbose){
         std::cout<<"Cost Matrix In assignment:\n";
@@ -1106,22 +959,6 @@ std::vector< std::vector<double> > bruteForceProb(const std::vector< double >& c
             std::cout<<std::endl;
         }
     }
-    //     // std::cout<<" ------ \n";
-    //     // std::cout<<"Probs with conditioning: \n ------ \n";
-    //     // for(size_t l = 0; l < nL+1; l++){
-    //     //     for(size_t m = 0; m < nM; m++){
-    //     //         std::cout<<probs[m][l]<<" ";
-    //     //     }
-    //     //     std::cout<<std::endl;
-    //     // }
-    //     // std::cout<<" ------ \n";
-    //     std::cout<<"Orig Dimensions: "<<nRowsOrig<<" , "<<nCols<<std::endl;
-    //     std::cout<<"Cond Dimensions: "<<nRows<<" , "<<nCols<<std::endl;
-    //     std::cout<<"Biggest error: "<<err<<std::endl;
-    //     std::cout<<"time w/o conditioning: "<<1000*t2Non<<"ms.\n";
-    //     std::cout<<"time w/ conditioning: "<<1000*t2<<"ms.\n";
-    //     std::cin.get();
-    // }
     
     return probs;
 }
