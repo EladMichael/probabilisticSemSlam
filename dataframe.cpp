@@ -94,18 +94,22 @@ void dataframe::computeBoundingBoxes(bbNet& imageNet, const semConsts& runConsts
         //load the data from file
         std::ifstream ifs;
         ifs.open(dataLPath, std::ifstream::in);
+        size_t obj = 0;
         while(ifs.peek() != std::ifstream::traits_type::eof()){
             bbL.push_back(boundBox());
             ifs.read((char*)&bbL[obj], sizeof(bbL[obj]));
+            obj++;
         }
         ifs.close();
         // bbL.pop_back();
 
 
         ifs.open(dataRPath, std::ifstream::in);
+        obj = 0;
         while(ifs.peek() != std::ifstream::traits_type::eof()){
             bbR.push_back(boundBox());
             ifs.read((char*)&bbR[obj], sizeof(bbR[obj]));
+            obj++;
         }
         ifs.close(); 
         // bbR.pop_back();

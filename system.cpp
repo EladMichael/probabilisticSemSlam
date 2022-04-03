@@ -52,12 +52,18 @@ int main(int argc, char** argv) {
         throw std::runtime_error("Can't find calibration files in path: "+calibDir);
     }
     // ################## RUN OPTION BLOCK ###################
+    // which kitti sequence (0-21)
     int seq = 0;
+
+    // which calibration file to load
     std::string calibFile("calibSample.txt");
+
+    // run for all possible frames? Value of 0 means run all
     size_t maxFrame = 0;
+
+    // verbose flag currently does nothing, lots of little verbose flags
+    // all thorughout the code for debugging and understanding and such
     bool verbose = false;
-    bool verboseTiming = false;
-    bool frameReport = false;
 
     if(argc>1){
         seq = atoi(argv[1]);
@@ -68,7 +74,7 @@ int main(int argc, char** argv) {
             maxFrame = std::max(atoi(argv[3]),0);
         }
         if(argc>4){
-            frameReport = (atoi(argv[4])>0);
+            verbose = (atoi(argv[4])>0);
         }
         if(argc>5){
             std::cout<<"Too many arguments"<<std::endl;
@@ -76,7 +82,7 @@ int main(int argc, char** argv) {
         }
     }else{
         std::cout<<"usage: ./semslamRun seq# calibFile maxFrame verbose\n";
-        return 1;
+        std::cout<<"Running with all defaults!\n";
     }
 
     const semConsts runConsts(calibDir+calibFile);
@@ -144,7 +150,8 @@ int main(int argc, char** argv) {
     std::vector<int> numMeas(maxFrame,0);
     std::vector<int> numLand(maxFrame,0);
     // ###################### End Metrics Block #############################
-    
+
+
     // ###################### File Management Block #############################
     if(!file_exists("generatedData")){
         std::cout<<"Making generatedData directory.\n";
@@ -154,9 +161,9 @@ int main(int argc, char** argv) {
         std::cout<<"Making generatedData/seqSpecifier directory.\n";
         mkdir(("generatedData/"+kittiData.seqSpec).c_str(),0777);
     }
-    if(!file_exists("generatedData/"+std::to_string(kittiData.seqN)+"/costMatrices")){
+    if(!file_exists("generatedData/"+kittiData.seqSpec+"/costMatrices")){
         std::cout<<"Making generatedData/seqSpecifier/costMatrices directory.\n";
-        mkdir(("generatedData/"+std::to_string(kittiData.seqN)+"/costMatrices").c_str(),0777);
+        mkdir(("generatedData/"+kittiData.seqSpec+"/costMatrices").c_str(),0777);
     }
     // ###################### End File Management Block #############################
 
@@ -263,7 +270,7 @@ int main(int argc, char** argv) {
         std::vector< std::vector<double> > assignmentProbs = getAssignmentProbs(curFrame.quadEst,landmarks,runConsts);
 
         // save the assignment problem! This is for drawing, and for comparing the assignment methods
-        std::string savePath("generatedData/"+std::to_string(kittiData.seqN)+"/costMatrices/"+ID+"_frame"+std::to_string(frame)+".dat");
+        std::string savePath("generatedData/"+kittiData.seqSpec+"/costMatrices/"+ID+"_frame"+std::to_string(frame)+".dat");
         saveAssignmentProb(curFrame.quadEst,landmarks,runConsts,savePath);
 
         //if we have estimated quadrics, insert left and right bounding boxes

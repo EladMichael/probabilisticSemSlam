@@ -35,12 +35,17 @@
 // Path to kitti below should be the path to the directory ABOVE dataset, 
 // i.e. "kittiDirectory" in the example above
 
-const std::string pathToKitti("Path to Kitti Data");
+const std::string pathToKitti("ENTER YOUR PATH HERE/");
 
 // ###############################################################
 kittiReader::kittiReader(int seqN, bool color){   
     this->seqN = seqN;
     this->color = color;
+
+    if(pathToKitti == "ENTER YOUR PATH HERE/"){
+        throw std::runtime_error("Fill in the path to the KITTI dataset in kittiReader.cpp!\n");
+    }
+
     pathToData = pathToKitti + std::string("dataset/");
     pathToSeq = pathToData + std::string("sequences/");
     pathToPose = pathToData + std::string("poses/");
@@ -71,7 +76,7 @@ kittiReader::kittiReader(int seqN, bool color){
 void kittiReader::loadCalib(){
 
     if(!file_exists(pathToSeq + std::string("calib.txt"))){
-        std::string errMsg("Calibration could not be found!\nPath to Calibration: \n");
+        std::string errMsg("Kitti Calibration could not be found on path: ");
         errMsg += pathToSeq + std::string("calib.txt\n");
         throw std::runtime_error(errMsg);
     }

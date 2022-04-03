@@ -33,6 +33,18 @@ $ cmake --build .
 
 Which should create 2 executables, semSlamRun (the semantic SLAM data extraction), and compMethods (for comparing the assignment and permanent methods). 
 
+To use, run the following command (in the build directory, or if desired, run from above the build directory and add build/ to the executable path)
+```sh
+$ ./semslamRun
+```
+For an explanation of the run options, see the beginning of system.cpp
+
+To run the assignment comparison code, in the same folder run
+```sh
+$ ./compMethods o30_p0_k200_perm0_net1
+```
+where "o30_p0_k200_perm0_net1" is the default ID string from the default semslamRun code.
+
 ## Publication
 [Elad Michael, Tyler Summers, Tony A. Wood, Chris Manzie, and Iman Shames. "Probabilistic Data Association for Semantic SLAM at Scale." arXiv preprint arXiv:2202.12802 (2022).](https://arxiv.org/pdf/2202.12802.pdf)
 

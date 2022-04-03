@@ -65,7 +65,7 @@ int main(int argc, char** argv){
         return 1;
     }
     std::string idString = argv[1];
-    size_t k = 100;
+    size_t k = 200;
     size_t maxFrame = 4541;
     size_t startFrame = 0;
     if(argc>2){
@@ -197,7 +197,7 @@ int main(int argc, char** argv){
         k1Times.push_back(1000*t2);
 
         t1 = tic();
-        std::vector< std::vector<double> > k10Probs = assignmentProb(conditionedCosts,condL,nM,20);
+        std::vector< std::vector<double> > k20Probs = assignmentProb(conditionedCosts,condL,nM,20);
         t2 = toc(t1);
         k20Times.push_back(1000*t2);
 
@@ -262,7 +262,7 @@ int main(int argc, char** argv){
             for(size_t l = 0; l < truthProbs[0].size(); l++){
 
                 k1Errs[counter] = std::max(k1Errs[counter],std::abs(k1Probs[m][l]-truthProbs[m][l]));
-                k20Errs[counter] = std::max(k20Errs[counter],std::abs(k10Probs[m][l]-truthProbs[m][l]));
+                k20Errs[counter] = std::max(k20Errs[counter],std::abs(k20Probs[m][l]-truthProbs[m][l]));
                 k1000Errs[counter] = std::max(k1000Errs[counter],std::abs(k1000Probs[m][l]-truthProbs[m][l]));
                 k100Errs[counter] = std::max(k100Errs[counter],std::abs(k100Probs[m][l]-truthProbs[m][l]));
                 k200Errs[counter] = std::max(k200Errs[counter],std::abs(k200Probs[m][l]-truthProbs[m][l]));
