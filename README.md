@@ -27,15 +27,15 @@ If you are interested in just the code which computes the probabilistic assignme
 I use CMake for compilation, and have included the cmake file which works with my installation of the prerequisites, but your installation of the required packages will almost surely change the format of the CMake file. 
 
 ## How to use?
-With all prerequisites installed:
+The code is set up to run on the KITTI dataset. It could "easily" be converted to any other dataset, but a different data pipeline would have to be set up. As it is, download the [KITTI odometry dataset](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) (laser data not needed) and fill in the correct path to the dataset at the top of kittiReader.cpp . 
 
+With all prerequisites installed, CMake configured and the KITTI data downloaded, run in the top level:
 ```sh
 $ mkdir build
 $ cd build
 $ cmake ..
 $ cmake --build .
 ```
-
 Which should create 2 executables, semSlamRun (the semantic SLAM data extraction), and compMethods (for comparing the assignment and permanent methods). 
 
 To use, run the following command (in the build directory, or if desired, run from above the build directory and add build/ to the executable path)
@@ -50,8 +50,20 @@ $ ./compMethods o30_p0_k200_perm0_net1
 ```
 where "o30_p0_k200_perm0_net1" is the default ID string from the default semslamRun code.
 
+## Code Structure
+
+A vague initiation to the structure of the code to get you started:
+  - system.cpp: The hub for all of the code, the main driver of everything
+  - kittiReader: Extracts images and odometry from KITTI dataset
+  - bbNet: Loads neural network from nets folder, feeds images to it correctly, reads output
+  - dataframe: All of the images, measurement extraction, measurements from a single stereo frame
+  - assignment: Interface between the SLAM framework (measurements) and the assignment code (cost matrices)
+  - shortestPath: Compute the k-best assignments
+  - nwPerm: Compute the matrix permanent
+  - slidingWindow: handles the measurements/landmarks within the sliding window for SLAM estimation
+  - comparison: Compares the assignment method and permanent and generates comparison graphs (shown above)
+
 ## Publication
 [Elad Michael, Tyler Summers, Tony A. Wood, Chris Manzie, and Iman Shames. "Probabilistic Data Association for Semantic SLAM at Scale." arXiv preprint arXiv:2202.12802 (2022).](https://arxiv.org/pdf/2202.12802.pdf)
 
-#### Anything else that seems useful
-I'm happy to answer questions, just reach out!
+### I'm happy to answer questions, just reach out!
