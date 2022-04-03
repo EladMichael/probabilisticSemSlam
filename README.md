@@ -14,9 +14,9 @@ Semantic measurements are more human readable, unique/sparse in the environment,
 
 [![@youtube Probabilistic Assignment for Semantic SLAM](photoSamples/thumbnail.png)](https://youtu.be/-yuNgoN7JAI)
 
-![Assignment Enumeration vs. Permanent Computation Time](/photoSamples/timeScatLabelled2.pdf "Assignment Enumeration vs. Permanent Computation Time")
+![Assignment Enumeration vs. Permanent Computation Time](/photoSamples/scatterTime.png)
 
-![Assignment Enumeration vs. Permanent Accuracy](/photoSamples/errOrdStats.pdf "Assignment Enumeration vs. Permanent Accuracy")
+![Assignment Enumeration vs. Permanent Accuracy](/photoSamples/errOrdStats.png)
 
 ## Installation & Prerequisites
 This code is built primarily on [GTSAM](https://github.com/borglab/gtsam), [GTSAM-QUADRICS](https://github.com/best-of-acrv/gtsam-quadrics), Eigen and OpenCV(C++ and Python). For plotting, I have used [Matplot++](https://alandefreitas.github.io/matplotplusplus/). 
