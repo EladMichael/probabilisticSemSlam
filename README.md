@@ -19,9 +19,9 @@ Semantic measurements are more human readable, unique/sparse in the environment,
 ![Assignment Enumeration vs. Permanent Accuracy](/photoSamples/errOrdStats.png)
 
 ## Installation & Prerequisites
-This code is built primarily on [GTSAM](https://github.com/borglab/gtsam), [GTSAM-QUADRICS](https://github.com/best-of-acrv/gtsam-quadrics), Eigen and OpenCV(C++ and Python). For plotting, I have used [Matplot++](https://alandefreitas.github.io/matplotplusplus/). 
+This code is built primarily on [GTSAM](https://github.com/borglab/gtsam), [GTSAM-QUADRICS](https://github.com/best-of-acrv/gtsam-quadrics), Eigen and OpenCV(C++ and Python). For plotting, I have used [Matplot++](https://alandefreitas.github.io/matplotplusplus/). For data, I have used the [KITTI odometry dataset](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) without the laser data.
 
-If you are interested in just the code which computes the probabilistic assignment weights (located in assignment.cpp, and shortestPath.cpp), then none of the previously cited prerequisites are needed, except for potentially Eigen (depending on usage).
+If you are interested in just the code which computes the probabilistic assignment weights (located in assignment.cpp, and shortestPath.cpp), and are willing to do a bit of surgery to get it out, then none of the previously cited prerequisites are needed, except for potentially Eigen (depending on usage).
 
 ## Compilation
 I use CMake for compilation, and have included the cmake file which works with my installation of the prerequisites, but your installation of the required packages will almost surely change the format of the CMake file. 
