@@ -12,7 +12,7 @@ Semantic measurements are more human readable, unique/sparse in the environment,
 
 ## Video / Pictures
 
-[![@youtube Probabilistic Assignment for Semantic SLAM](photoSamples/thumbnail.png)](https://youtu.be/-yuNgoN7JAI)
+[![@youtube Probabilistic Assignment for Semantic SLAM at Scale](photoSamples/thumbnail.png)](https://youtu.be/-yuNgoN7JAI)
 
 ![Assignment Enumeration vs. Permanent Computation Time](/photoSamples/scatterTime.png)
 
